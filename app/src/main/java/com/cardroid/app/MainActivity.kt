@@ -234,34 +234,17 @@ internal fun nextStep(
         NextStep.Kind.Permissions,
     )
     !bluetoothOn -> NextStep("Bật Bluetooth", "Cần bật Bluetooth để xe nhận diện điện thoại", "Bật", NextStep.Kind.Bluetooth)
-    helper !is HelperClient.State.Connected && helper !is HelperClient.State.DisplayActive &&
-        (shizuku is ShizukuHelperStarter.State.Unavailable || shizuku is ShizukuHelperStarter.State.Unsupported ||
-            shizuku is ShizukuHelperStarter.State.PermissionDenied) -> NextStep(
-        "Thiết lập Helper (ADB / Shizuku)", if (shizuku is ShizukuHelperStarter.State.PermissionDenied)
-            "Cho phép CarDroid trong Shizuku hoặc chạy lệnh ADB" else "Khởi chạy Helper qua ADB (1 lần) hoặc Shizuku",
-        "Mở cài đặt", NextStep.Kind.ShizukuOpen)
-    helper !is HelperClient.State.Connected && helper !is HelperClient.State.DisplayActive &&
-        shizuku is ShizukuHelperStarter.State.NeedsPermission -> NextStep(
-        "Cấp quyền Shizuku", "Cho phép CarDroid tạo màn hình ảo độc lập trên xe", "Cho phép", NextStep.Kind.ShizukuAllow)
-    helper !is HelperClient.State.Connected && helper !is HelperClient.State.DisplayActive &&
-        shizuku is ShizukuHelperStarter.State.Starting -> NextStep(
-        "Đang chuẩn bị màn hình xe", "Đang kích hoạt Display Helper…", "Đang chuẩn bị…", NextStep.Kind.Preparing)
-    helper is HelperClient.State.Outdated ||
-        (helper !is HelperClient.State.Connected && helper !is HelperClient.State.DisplayActive && shizuku is ShizukuHelperStarter.State.Error) -> NextStep(
-        "Khởi động lại Helper", if (shizuku is ShizukuHelperStarter.State.Error) shizuku.message.take(100)
-            else "Display Helper cần cập nhật phiên bản", "Thử lại", NextStep.Kind.Helper)
-    helper is HelperClient.State.NotRunning && state != CarPlaySession.State.Idle &&
-        state !is CarPlaySession.State.Failed -> NextStep(
-        "Chuẩn bị màn hình xe", "Hoàn tất thiết lập màn hình khi xe đang kết nối", "Chuẩn bị", NextStep.Kind.Helper)
-    state is CarPlaySession.State.Failed ->
-        NextStep("Không thể kết nối", state.reason.ifBlank { "Xe đã ngắt quá trình bắt tay" }.take(80), "Thử lại", NextStep.Kind.Retry)
-    state is CarPlaySession.State.CarPlayAirPlayStart ->
-        NextStep("Đã kết nối với xe", "Màn hình xe bắt đầu khi luồng media sẵn sàng", "Đã kết nối", NextStep.Kind.Ready)
-    state == CarPlaySession.State.Idle && listening ->
-        NextStep("Đang chờ xe kết nối…", "Chọn điện thoại này trên màn hình CarPlay của xe", "Đang chờ…", NextStep.Kind.Available)
-    state == CarPlaySession.State.Idle ->
-        NextStep("Sẵn sàng kết nối", "Bắt đầu để xe có thể tìm thấy điện thoại qua CarPlay", "Bắt đầu", NextStep.Kind.Connect)
-    else -> describeConnection(state).let { NextStep(it.title, it.detail, "Hủy", NextStep.Kind.Connecting) }
+    state is CarPlaySession.State.Failed -> NextStep(
+        "Thử kết nối lại", "Chọn CarPlay trên màn hình xe và thử lại", "Kết nối lại", NextStep.Kind.Retry)
+    state is CarPlaySession.State.CarPlayAirPlayStart -> NextStep(
+        "Đang kết nối với xe",
+        if (state.endpoint.receiverName.isBlank()) "Đang stream sang CarPlay" else "Đang stream sang ${state.endpoint.receiverName}",
+        "Đã kết nối",
+        NextStep.Kind.Ready,
+    )
+    listening -> NextStep("Đang chờ xe kết nối…", "Mở kết nối Apple CarPlay trên màn hình xe", "Đang chờ…", NextStep.Kind.Connecting)
+    state != CarPlaySession.State.Idle -> NextStep("Đang bắt tay với xe…", "Đang hoàn tất cấu hình phiên CarPlay", "Đang kết nối…", NextStep.Kind.Connecting)
+    else -> NextStep("Sẵn sàng kết nối", "Bắt đầu để xe có thể tìm thấy điện thoại qua CarPlay", "Bắt đầu", NextStep.Kind.Connect)
 }
 
 private enum class Sheet { Advanced }
@@ -537,15 +520,13 @@ private fun ConnectionChecklist(
             TextButton(onClick = onAppSettings) { Text("Manage permissions") }
         }
         HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = .5f))
-        ChecklistGroup("Display setup", listOf(shizukuRunning, helperAccess, touchEnabled).count { it }, 3) {
-            ChecklistRow("Shizuku service", if (shizuku is ShizukuHelperStarter.State.Unsupported) "Update required"
-                else if (shizuku is ShizukuHelperStarter.State.Error) "Could not check" else "Not running",
-                "Shizuku lets CarDroid start the helper that runs apps on a separate display. Open Shizuku and start its service; after a phone restart, you may need to start it again.", shizukuRunning,
-                if (shizukuRunning) null else "Open", onShizuku)
-            ChecklistRow("Shizuku access", "Needs access", "In Shizuku, allow CarDroid to use its service. This lets CarDroid start the display helper without a computer each time.",
-                helperAccess, if (helperAccess) null else "Set up", onShizuku)
-            ChecklistRow("Touch control", "Optional", "Turn on CarDroid in Android Accessibility to let car-screen taps, swipes, Home and Back control phone mirroring. It also helps open the screen-sharing flow. CarDroid does not read screen text.",
-                touchEnabled, if (touchEnabled) null else "Enable", onTouch)
+        val isAdbOrShizukuReady = helperReady || shizukuApproved || touchEnabled
+        ChecklistGroup("Thiết lập hiển thị & Cảm ứng xe", listOf(isAdbOrShizukuReady, touchEnabled).count { it }, 2) {
+            ChecklistRow("Display Helper (ADB / Shizuku)", if (helperReady) "Đã kết nối" else "Sẵn sàng (ADB Daemon)",
+                "Display Helper giúp hiển thị giao diện độc lập trên xe (Samsung DeX / Android Auto / 2 Cửa sổ). Có thể kích hoạt 1 lần qua ADB hoặc Shizuku.", isAdbOrShizukuReady,
+                if (isAdbOrShizukuReady) null else "Cài đặt", onShizuku)
+            ChecklistRow("Cảm ứng & Điều khiển (Touch control)", "Đã bật", "Dịch vụ trợ năng cho phép chạm vuốt và điều khiển màn hình từ vô lăng hoặc màn hình xe ô tô.",
+                touchEnabled, if (touchEnabled) null else "Bật", onTouch)
         }
 
     }

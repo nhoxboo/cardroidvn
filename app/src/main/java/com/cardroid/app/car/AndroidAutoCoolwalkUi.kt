@@ -12,6 +12,9 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
@@ -175,15 +178,25 @@ internal fun AndroidAutoCoolwalkScreen(
                         }
                     }
                     Spacer(Modifier.height(16.dp))
-                    AppGrid(
-                        apps = apps,
-                        prefs = prefs,
-                        onLaunch = {
-                            showAppDrawer = false
-                            onLaunch(it)
-                        },
-                        onLongPress = { _, _ -> }
-                    )
+                    LazyVerticalGrid(
+                        columns = GridCells.Adaptive(minSize = 96.dp),
+                        verticalArrangement = Arrangement.spacedBy(16.dp),
+                        horizontalArrangement = Arrangement.spacedBy(16.dp),
+                        modifier = Modifier.fillMaxSize()
+                    ) {
+                        items(apps, key = { it.target }) { app ->
+                            AppCell(
+                                app = app,
+                                pinned = false,
+                                dimmed = false,
+                                onLaunch = {
+                                    showAppDrawer = false
+                                    onLaunch(it)
+                                },
+                                onLongPress = { _, _ -> }
+                            )
+                        }
+                    }
                 }
             }
         }
