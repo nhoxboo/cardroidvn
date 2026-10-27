@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">CarDroid</string>
+    <string name="app_name">cardroidvn</string>
     <string name="remote_control_description">Cho phép màn hình CarPlay trên ô tô gửi thao tác chạm vuốt về điện thoại khi đang chia sẻ. CarDroid không đọc nội dung màn hình hay thông tin cửa sổ ứng dụng.</string>
 
     <!-- Giao diện chung & Điều hướng -->

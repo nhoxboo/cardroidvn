@@ -1,16 +1,56 @@
 <?xml version="1.0" encoding="utf-8"?>
-<vector xmlns:android="http://schemas.android.com/apk/res/android" android:width="108dp" android:height="108dp" android:viewportWidth="108" android:viewportHeight="108">
-    <!-- Green rounded-square tile inside the 66dp safe zone, so circle masks keep its corners. -->
-    <path android:fillColor="@color/cardroid_icon_green"
-        android:pathData="M41,26H67C75.3,26 82,32.7 82,41V67C82,75.3 75.3,82 67,82H41C32.7,82 26,75.3 26,67V41C26,32.7 32.7,26 41,26Z" />
-    <!-- Android head + native dashboard / play screen. -->
-    <group android:pivotX="54" android:pivotY="54" android:scaleX="0.6" android:scaleY="0.6" android:translateY="1">
-        <path android:fillColor="@android:color/transparent" android:strokeColor="@color/cardroid_icon_white"
-            android:strokeWidth="4" android:strokeLineCap="round" android:pathData="M43,33L37,23M65,33L71,23" />
-        <path android:fillColor="@color/cardroid_icon_white" android:fillType="evenOdd"
-            android:pathData="M26,52C26,38 38,29 54,29C70,29 82,38 82,52ZM45,44a3,3 0,1 0,-6,0a3,3 0,1 0,6,0M69,44a3,3 0,1 0,-6,0a3,3 0,1 0,6,0" />
-        <path android:fillColor="@color/cardroid_icon_white" android:fillType="evenOdd"
-            android:pathData="M34,58H74C78.4,58 82,61.6 82,66V76C82,80.4 78.4,84 74,84H34C29.6,84 26,80.4 26,76V66C26,61.6 29.6,58 34,58ZM34,63C32.3,63 31,64.3 31,66V76C31,77.7 32.3,79 34,79H74C75.7,79 77,77.7 77,76V66C77,64.3 75.7,63 74,63Z" />
-        <path android:fillColor="@color/cardroid_icon_white" android:pathData="M51,65.5L60,70.5C60.5,70.8 60.5,71.2 60,71.5L51,76.5Z" />
-    </group>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    
+    <!-- Outer Premium Automotive Tile: High-Tech Royal Blue -->
+    <path
+        android:fillColor="#0066FF"
+        android:pathData="M38,20 H70 C80,20 88,28 88,38 V70 C88,80 80,88 70,88 H38 C28,88 20,80 20,70 V38 C20,28 28,20 38,20 Z" />
+
+    <!-- Inner Sleek Curved Dashboard Display Grid -->
+    <path
+        android:fillColor="#0D1B2A"
+        android:pathData="M40,26 H68 C76,26 82,32 82,40 V68 C82,76 76,82 68,82 H40 C32,82 26,76 26,68 V40 C26,32 32,26 40,26 Z" />
+
+    <!-- Android Antennae (Electric Cyan) -->
+    <path
+        android:strokeColor="#00E5FF"
+        android:strokeWidth="3.5"
+        android:strokeLineCap="round"
+        android:pathData="M44,36 L38,27 M64,36 L70,27" />
+
+    <!-- Android Head / Car Cockpit Dome (Pure White) -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M32,49 C32,37 42,33 54,33 C66,33 76,37 76,49 Z" />
+
+    <!-- Smart Glowing Eyes (Royal Blue) -->
+    <path
+        android:fillColor="#0066FF"
+        android:pathData="M43,44 A2.5,2.5 0 1 0 43,39 A2.5,2.5 0 1 0 43,44 Z M65,44 A2.5,2.5 0 1 0 65,39 A2.5,2.5 0 1 0 65,44 Z" />
+
+    <!-- Split-Screen Automotive Panels: Navigation & Music -->
+    <!-- Left Navigation Card -->
+    <path
+        android:fillColor="#00E5FF"
+        android:pathData="M31,54 H51 C52.5,54 53.5,55 53.5,56.5 V75 C53.5,76.5 52.5,77.5 51,77.5 H31 C29.5,77.5 28.5,76.5 28.5,75 V56.5 C28.5,55 29.5,54 31,54 Z" />
+
+    <!-- Right Media Card with "VN" Star Accent -->
+    <path
+        android:fillColor="#FFD700"
+        android:pathData="M56.5,54 H77 C78.5,54 79.5,55 79.5,56.5 V75 C79.5,76.5 78.5,77.5 77,77.5 H56.5 C55,77.5 54,76.5 54,75 V56.5 C54,55 55,54 56.5,54 Z" />
+
+    <!-- Navigation Arrow Icon in Left Card -->
+    <path
+        android:fillColor="#0D1B2A"
+        android:pathData="M41,59 L48,72 L41,69 L34,72 Z" />
+
+    <!-- Music Note Icon in Right Card -->
+    <path
+        android:fillColor="#0D1B2A"
+        android:pathData="M64,60 H71 V68 A3,3 0 1 1 68,65 V62 H64 Z" />
+
 </vector>

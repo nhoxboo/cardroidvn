@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="cardroid_icon_green">#087D63</color>
-    <color name="cardroid_icon_white">#EDF7F2</color>
+    <color name="cardroid_icon_green">#0066FF</color>
+    <color name="cardroid_icon_white">#0A192F</color>
 </resources>

@@ -47,11 +47,14 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import kotlinx.coroutines.launch
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -318,6 +321,27 @@ private fun CarDroidScreen(
     }
     var sheet by remember { mutableStateOf<Sheet?>(null) }
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+    var updateInfo by remember { mutableStateOf<com.cardroid.app.update.AppUpdater.UpdateInfo?>(null) }
+    var isCheckingUpdate by remember { mutableStateOf(false) }
+
+    LaunchedEffect(Unit) {
+        val info = com.cardroid.app.update.AppUpdater.checkLatestRelease()
+        if (info != null && info.hasNewVersion) {
+            updateInfo = info
+        }
+    }
+
+    if (updateInfo != null && updateInfo!!.hasNewVersion) {
+        com.cardroid.app.update.UpdateAvailableDialog(
+            updateInfo = updateInfo!!,
+            onConfirmUpdate = {
+                val url = updateInfo!!.downloadUrl
+                updateInfo = null
+                com.cardroid.app.update.AppUpdater.startDownloadAndInstall(context, url)
+            },
+            onDismiss = { updateInfo = null }
+        )
+    }
 
     val onAction: () -> Unit = when (step.kind) {
         NextStep.Kind.Permissions -> onRequestPerms
@@ -344,7 +368,7 @@ private fun CarDroidScreen(
                         )
                         Spacer(Modifier.width(12.dp))
                         Column(Modifier.weight(1f)) {
-                            Text("CarDroid", style = MaterialTheme.typography.headlineSmall)
+                            Text("cardroidvn", style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Bold)
                             Text(CarDroidName.forPhone(androidx.compose.ui.platform.LocalContext.current),
                                 style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant,
                                 maxLines = 1, overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis)
@@ -354,7 +378,7 @@ private fun CarDroidScreen(
                     }
                 },
                 actions = {
-                    TextButton(onClick = { sheet = Sheet.Advanced }) { Text("Advanced") }
+                    TextButton(onClick = { sheet = Sheet.Advanced }) { Text("Cài đặt", fontWeight = FontWeight.SemiBold) }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(containerColor = MaterialTheme.colorScheme.background),
             )
@@ -611,6 +635,55 @@ private fun AdvancedSheet(
     var showCopiedToast by remember { mutableStateOf(false) }
 
     Text("Cài đặt & Tối ưu hóa", style = MaterialTheme.typography.headlineSmall)
+    Spacer(Modifier.height(8.dp))
+
+    // BANNER BẢN QUYỀN HOÀI NAM
+    Surface(
+        color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.45f),
+        shape = androidx.compose.foundation.shape.RoundedCornerShape(14.dp),
+        modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp)
+    ) {
+        Column(Modifier.padding(14.dp)) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Text("🚗", fontSize = 22.sp)
+                Spacer(Modifier.width(10.dp))
+                Column(Modifier.weight(1f)) {
+                    Text("cardroidvn ${com.cardroid.app.update.AppUpdater.CURRENT_VERSION}", fontWeight = FontWeight.Bold, style = MaterialTheme.typography.titleMedium)
+                    Text("Bản quyền © Hoài Nam • Phát triển cho xe ô tô", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                }
+            }
+            Spacer(Modifier.height(8.dp))
+            var checkMsg by remember { mutableStateOf<String?>(null) }
+            val coroutineScope = rememberCoroutineScope()
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                OutlinedButton(
+                    onClick = {
+                        checkMsg = "Đang kiểm tra..."
+                        coroutineScope.launch {
+                            val res = com.cardroid.app.update.AppUpdater.checkLatestRelease()
+                            if (res != null) {
+                                if (res.hasNewVersion) {
+                                    checkMsg = "Có bản mới: ${res.latestTag}!"
+                                    com.cardroid.app.update.AppUpdater.startDownloadAndInstall(context, res.downloadUrl)
+                                } else {
+                                    checkMsg = "✓ Đang là phiên bản mới nhất"
+                                }
+                            } else {
+                                checkMsg = "Không thể kiểm tra lúc này"
+                            }
+                        }
+                    },
+                    modifier = Modifier.height(36.dp)
+                ) {
+                    Text("Kiểm tra cập nhật GitHub", fontSize = 12.sp)
+                }
+                checkMsg?.let {
+                    Spacer(Modifier.width(10.dp))
+                    Text(it, fontSize = 12.sp, color = MaterialTheme.colorScheme.primary)
+                }
+            }
+        }
+    }
     Spacer(Modifier.height(10.dp))
 
     // 1. CHẾ ĐỘ HIỂN THỊ / GIAO THỨC
