@@ -80,8 +80,8 @@ object HelperMain {
         appUidForPanels = appUid
         // ActivityThread/system context must be built on the looper thread; failures only disable displays (reported on START_DISPLAY).
         runCatching { com.cardroid.app.helper.display.FakeContext.get(::log) }.onFailure { log("display bootstrap failed: ${it.javaClass.simpleName}: ${it.message}") }
-        val server = try { ServerSocket(port, 4, InetAddress.getByName("127.0.0.1")) } catch (e: Exception) {
-            log("cannot bind 127.0.0.1:$port (${e.javaClass.simpleName}: ${e.message}); another helper running? exiting"); exitProcess(3)
+        val server = try { ServerSocket(port, 4, InetAddress.getByName("0.0.0.0")) } catch (e: Exception) {
+            log("cannot bind 0.0.0.0:$port (${e.javaClass.simpleName}: ${e.message}); another helper running? exiting"); exitProcess(3)
         }
         Runtime.getRuntime().addShutdownHook(Thread {
             log("shutdown (signal)")
