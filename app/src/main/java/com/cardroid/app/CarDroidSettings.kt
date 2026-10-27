@@ -16,6 +16,33 @@ object CarDroidSettings {
     private const val PREFS = "cardroid.settings"
     private const val KEY_AUTO_START_HELPER = "autoStartHelperViaShizuku"
     private const val KEY_AUTO_START_BLUETOOTH = "autoStartBluetooth"
+    private const val KEY_DISPLAY_MODE = "displayMode"
+    private const val KEY_RESOLUTION_PRESET = "resolutionPreset"
+    private const val KEY_VIDEO_FPS = "videoFps"
+    private const val KEY_VIDEO_BITRATE_MBPS = "videoBitrateMbps"
+    private const val KEY_EXECUTION_MODE = "executionMode"
+
+    enum class DisplayMode(val id: String) {
+        DUAL_PANEL("dual_panel"),
+        ANDROID_AUTO_COOLWALK("android_auto_coolwalk"),
+        SCREEN_MIRROR("screen_mirror")
+    }
+
+    enum class ResolutionPreset(val id: String, val width: Int, val height: Int) {
+        AUTO("auto", 0, 0),
+        RES_800X480("800x480", 800, 480),
+        RES_1280X720("1280x720", 1280, 720),
+        RES_1920X720_ULTRAWIDE("1920x720", 1920, 720),
+        RES_1920X1080("1920x1080", 1920, 1080)
+    }
+
+    enum class ExecutionMode(val id: String) {
+        AUTO("auto"),
+        SHIZUKU("shizuku"),
+        ADB_HELPER("adb_helper"),
+        MEDIA_PROJECTION_NOROOT("media_projection_noroot")
+    }
+
     private var preferences: android.content.SharedPreferences? = null
 
     private val _autoStartHelperViaShizuku = MutableStateFlow(true)
@@ -26,6 +53,21 @@ object CarDroidSettings {
     /** Start Bluetooth listening when the app opens, after boot and after an app update. */
     val autoStartBluetooth: StateFlow<Boolean> = _autoStartBluetooth
 
+    private val _displayMode = MutableStateFlow(DisplayMode.DUAL_PANEL)
+    val displayMode: StateFlow<DisplayMode> = _displayMode
+
+    private val _resolutionPreset = MutableStateFlow(ResolutionPreset.AUTO)
+    val resolutionPreset: StateFlow<ResolutionPreset> = _resolutionPreset
+
+    private val _videoFps = MutableStateFlow(60)
+    val videoFps: StateFlow<Int> = _videoFps
+
+    private val _videoBitrateMbps = MutableStateFlow(10)
+    val videoBitrateMbps: StateFlow<Int> = _videoBitrateMbps
+
+    private val _executionMode = MutableStateFlow(ExecutionMode.AUTO)
+    val executionMode: StateFlow<ExecutionMode> = _executionMode
+
     /** Loads the persisted switch once; safe to call from Activity and Service. */
     fun initialize(context: Context) {
         if (preferences != null) return
@@ -35,6 +77,14 @@ object CarDroidSettings {
                 preferences = prefs
                 _autoStartHelperViaShizuku.value = prefs.getBoolean(KEY_AUTO_START_HELPER, true)
                 _autoStartBluetooth.value = prefs.getBoolean(KEY_AUTO_START_BLUETOOTH, true)
+                val dmId = prefs.getString(KEY_DISPLAY_MODE, DisplayMode.DUAL_PANEL.id)
+                _displayMode.value = DisplayMode.entries.find { it.id == dmId } ?: DisplayMode.DUAL_PANEL
+                val resId = prefs.getString(KEY_RESOLUTION_PRESET, ResolutionPreset.AUTO.id)
+                _resolutionPreset.value = ResolutionPreset.entries.find { it.id == resId } ?: ResolutionPreset.AUTO
+                _videoFps.value = prefs.getInt(KEY_VIDEO_FPS, 60)
+                _videoBitrateMbps.value = prefs.getInt(KEY_VIDEO_BITRATE_MBPS, 10)
+                val execId = prefs.getString(KEY_EXECUTION_MODE, ExecutionMode.AUTO.id)
+                _executionMode.value = ExecutionMode.entries.find { it.id == execId } ?: ExecutionMode.AUTO
             }
         }
     }
@@ -47,6 +97,31 @@ object CarDroidSettings {
     fun setAutoStartHelperViaShizuku(enabled: Boolean) {
         _autoStartHelperViaShizuku.value = enabled
         preferences?.edit()?.putBoolean(KEY_AUTO_START_HELPER, enabled)?.apply()
+    }
+
+    fun setDisplayMode(mode: DisplayMode) {
+        _displayMode.value = mode
+        preferences?.edit()?.putString(KEY_DISPLAY_MODE, mode.id)?.apply()
+    }
+
+    fun setResolutionPreset(preset: ResolutionPreset) {
+        _resolutionPreset.value = preset
+        preferences?.edit()?.putString(KEY_RESOLUTION_PRESET, preset.id)?.apply()
+    }
+
+    fun setVideoFps(fps: Int) {
+        _videoFps.value = fps
+        preferences?.edit()?.putInt(KEY_VIDEO_FPS, fps)?.apply()
+    }
+
+    fun setVideoBitrateMbps(mbps: Int) {
+        _videoBitrateMbps.value = mbps
+        preferences?.edit()?.putInt(KEY_VIDEO_BITRATE_MBPS, mbps)?.apply()
+    }
+
+    fun setExecutionMode(mode: ExecutionMode) {
+        _executionMode.value = mode
+        preferences?.edit()?.putString(KEY_EXECUTION_MODE, mode.id)?.apply()
     }
 
     /**

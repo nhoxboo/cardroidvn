@@ -424,16 +424,16 @@ private fun AppMenu(app: CarApp, pinned: Boolean, canPin: Boolean, onTogglePin: 
             Spacer(Modifier.width(14.dp))
             Column {
                 Text(app.label, color = Car.Text, maxLines = 1, overflow = TextOverflow.Ellipsis, style = TextStyle(fontSize = 18.sp, fontWeight = FontWeight.SemiBold))
-                Text(if (pinned) "In favorites" else app.packageName, maxLines = 1, overflow = TextOverflow.Ellipsis, color = if (pinned) Car.Accent else Car.TextDim, style = TextStyle(fontSize = 13.sp, fontWeight = FontWeight.Medium))
+                Text(if (pinned) "Đã ghim ưa thích" else app.packageName, maxLines = 1, overflow = TextOverflow.Ellipsis, color = if (pinned) Car.Accent else Car.TextDim, style = TextStyle(fontSize = 13.sp, fontWeight = FontWeight.Medium))
             }
         }
         Box(Modifier.fillMaxWidth().padding(horizontal = 18.dp).height(1.dp).background(Car.Hairline))
         MenuItem(
-            text = if (pinned) "Remove from favorites" else "Add to favorites",
-            sub = if (!canPin) "Favorites are full (${CarLauncherLogic.MAX_PINNED})" else null,
+            text = if (pinned) "Bỏ ghim ưa thích" else "Thêm vào ưa thích",
+            sub = if (!canPin) "Danh sách ưa thích đã đầy (${CarLauncherLogic.MAX_PINNED})" else null,
             enabled = canPin, onClick = onTogglePin,
         ) { c -> glyphStar(c, filled = pinned) }
-        MenuItem(text = "Hide from car", onClick = onHide) { c -> glyphEyeOff(c) }
+        MenuItem(text = "Ẩn khỏi màn hình xe", onClick = onHide) { c -> glyphEyeOff(c) }
     }
 }
 
@@ -477,7 +477,7 @@ private fun RecentsPanel(ownPackage: String, onPick: (Int) -> Unit) {
     var requested by remember { mutableStateOf<Boolean?>(null) }
     LaunchedEffect(Unit) { requested = CarDisplayState.listTasks(12) }
     val recents = remember(tasks) { CarLauncherLogic.recents(tasks, ownPackage) }
-    PanelFrame("Recent apps", "Running on the car display") {
+    PanelFrame("Ứng dụng gần đây", "Đang chạy trên màn hình xe") {
         when {
             recents.isNotEmpty() -> LazyRow(contentPadding = PaddingValues(horizontal = 40.dp), horizontalArrangement = Arrangement.spacedBy(16.dp)) {
                 items(recents, key = { it.taskId }) { t ->
@@ -485,17 +485,17 @@ private fun RecentsPanel(ownPackage: String, onPick: (Int) -> Unit) {
                     PanelCard(iconKey = t.component.ifEmpty { t.pkg }, label = label, onClick = { onPick(t.taskId) })
                 }
             }
-            requested == false -> PanelNote("Recent apps need the car display helper.")
-            else -> PanelNote("No other apps are open on the car display.")
+            requested == false -> PanelNote("Ứng dụng gần đây cần Display Helper hoạt động.")
+            else -> PanelNote("Chưa có ứng dụng nào khác đang mở trên màn hình xe.")
         }
     }
 }
 
 @Composable
 private fun HiddenPanel(apps: List<CarApp>, onUnhide: (CarApp) -> Unit) {
-    PanelFrame("Hidden from car", "Tap an app to show it again") {
+    PanelFrame("Ứng dụng đã ẩn", "Chạm vào ứng dụng để hiển thị lại") {
         LazyRow(contentPadding = PaddingValues(horizontal = 40.dp), horizontalArrangement = Arrangement.spacedBy(16.dp)) {
-            items(apps, key = { it.target }) { app -> PanelCard(iconKey = app.target, label = app.label, dim = true, action = "Show", onClick = { onUnhide(app) }) }
+            items(apps, key = { it.target }) { app -> PanelCard(iconKey = app.target, label = app.label, dim = true, action = "Hiện lại", onClick = { onUnhide(app) }) }
         }
     }
 }

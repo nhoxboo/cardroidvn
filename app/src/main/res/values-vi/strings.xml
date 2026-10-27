@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">CarDroid</string>
+    <string name="remote_control_description">Cho phép màn hình CarPlay trên ô tô gửi thao tác chạm vuốt về điện thoại khi đang chia sẻ. CarDroid không đọc nội dung màn hình hay thông tin cửa sổ ứng dụng.</string>
+
+    <!-- Giao diện chung & Điều hướng -->
+    <string name="title_launcher">Giao diện Xe (Car Launcher)</string>
+    <string name="title_settings">Cài đặt</string>
+    <string name="title_status">Trạng thái kết nối</string>
+    <string name="status_ready">Sẵn sàng kết nối với xe</string>
+    <string name="status_connecting">Đang kết nối…</string>
+    <string name="status_connected">Đã kết nối với xe</string>
+    <string name="status_disconnected">Đã ngắt kết nối</string>
+    <string name="btn_start_service">Khởi động CarDroid</string>
+    <string name="btn_stop_service">Dừng CarDroid</string>
+    <string name="btn_enable_bluetooth">Bật Bluetooth</string>
+    <string name="btn_grant_permissions">Cấp quyền ứng dụng</string>
+    <string name="btn_setup_accessibility">Bật hỗ trợ cảm ứng (Accessibility)</string>
+
+    <!-- Giao diện màn hình xe (Car Launcher UI) -->
+    <string name="launcher_tap_to_choose">Chạm vào thanh chỉ báo để chọn ứng dụng</string>
+    <string name="launcher_in_favorites">Đã ghim ưa thích</string>
+    <string name="launcher_remove_favorite">Bỏ ghim ưa thích</string>
+    <string name="launcher_add_favorite">Thêm vào ưa thích</string>
+    <string name="launcher_favorites_full">Danh sách ưa thích đã đầy (tối đa 6)</string>
+    <string name="launcher_hide_app">Ẩn khỏi màn hình xe</string>
+    <string name="launcher_recent_apps">Ứng dụng gần đây</string>
+    <string name="launcher_running_on_display">Đang chạy trên màn hình xe</string>
+    <string name="launcher_hidden_apps">Ứng dụng đã ẩn</string>
+    <string name="launcher_hidden_apps_desc">Chạm vào ứng dụng để hiển thị lại trên màn hình xe</string>
+    <string name="launcher_unhide">Hiện lại</string>
+
+    <!-- Chế độ hiển thị & Chuyển đổi giao thức -->
+    <string name="mode_cardroid_dual">CarDroid 2 Cửa Sổ (Dual-Panel)</string>
+    <string name="mode_cardroid_dual_desc">Chạy 2 ứng dụng Android song song độc lập trên màn hình xe</string>
+    <string name="mode_android_auto">Cầu nối Android Auto (Coolwalk UI)</string>
+    <string name="mode_android_auto_desc">Giả lập giao diện Android Auto chuẩn xuất tín hiệu qua Apple CarPlay</string>
+    <string name="mode_screen_mirror">Phản chiếu màn hình (Không cần Root)</string>
+    <string name="mode_screen_mirror_desc">Chiếu trực tiếp màn hình điện thoại với cảm ứng qua dịch vụ Trợ năng</string>
+
+    <!-- Tối ưu hóa Giao thức & Truyền phát -->
+    <string name="pref_category_protocol">Tối ưu giao thức &amp; Luồng truyền phát</string>
+    <string name="pref_resolution">Độ phân giải màn hình</string>
+    <string name="pref_resolution_desc">Chọn độ phân giải phù hợp màn hình xe (VinFast, Mazda, Hyundai...)</string>
+    <string name="pref_fps">Tốc độ khung hình (FPS)</string>
+    <string name="pref_fps_desc">30 FPS (Tiết kiệm pin, ổn định) hoặc 60 FPS (Siêu mượt)</string>
+    <string name="pref_bitrate">Bitrate luồng Video</string>
+    <string name="pref_bitrate_desc">Điều chỉnh chất lượng hình ảnh và độ ổn định Wi-Fi</string>
+    <string name="pref_auto_reconnect">Tự động kết nối lại</string>
+    <string name="pref_auto_reconnect_desc">Tự động kích hoạt phiên làm việc khi phát hiện Bluetooth xe</string>
+
+    <!-- Chế độ chạy máy không root & ADB -->
+    <string name="pref_category_execution">Chế độ vận hành &amp; Quyền hạn</string>
+    <string name="execution_mode_title">Cơ chế quản lý màn hình ảo</string>
+    <string name="execution_mode_shizuku">Shizuku / Root (Màn hình ảo độc lập)</string>
+    <string name="execution_mode_adb">Khởi chạy Helper 1 lần qua ADB (Khuyên dùng cho máy không root)</string>
+    <string name="execution_mode_noroot">Thuần Không Root (MediaProjection + Trợ năng)</string>
+    <string name="adb_setup_guide_title">Hướng dẫn cấp quyền qua ADB (Chỉ cần làm 1 lần)</string>
+    <string name="adb_setup_guide_content">Chạy lệnh sau từ máy tính hoặc qua tính năng Gỡ lỗi không dây (Wireless Debugging) để mở khóa màn hình phụ độc lập mà không cần Root hay cài Shizuku:</string>
+    <string name="btn_copy_adb_command">Sao chép lệnh ADB</string>
+    <string name="adb_command_copied">Đã sao chép lệnh vào bộ nhớ tạm</string>
+</resources>

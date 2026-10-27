@@ -32,10 +32,12 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FilterChip
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Switch
@@ -188,22 +190,22 @@ internal data class PermissionSnapshot(val missing: List<String>) {
 private data class ConnectionStatus(val title: String, val detail: String)
 
 private fun describeConnection(state: CarPlaySession.State): ConnectionStatus = when (state) {
-    CarPlaySession.State.Idle -> ConnectionStatus("Connect to your car", "Open CarPlay on the car first")
-    CarPlaySession.State.LinkUp -> ConnectionStatus("Connecting", "Link established")
-    is CarPlaySession.State.MfiCertReceived -> ConnectionStatus("Connecting", "Checking the receiver")
-    is CarPlaySession.State.Authenticating -> ConnectionStatus("Connecting", "Verifying the receiver")
-    CarPlaySession.State.AuthComplete -> ConnectionStatus("Connecting", "Receiver accepted")
-    CarPlaySession.State.Identified -> ConnectionStatus("Connecting", "Opening CarPlay")
-    CarPlaySession.State.EaSessionOpen -> ConnectionStatus("Connecting", "CarPlay session open")
-    CarPlaySession.State.WifiHandoffRequested -> ConnectionStatus("Connecting", "Waiting for Wi-Fi")
-    is CarPlaySession.State.WifiHandoffReceived -> ConnectionStatus("Connecting", "Joining ${state.ssid}")
+    CarPlaySession.State.Idle -> ConnectionStatus("Sẵn sàng kết nối với xe", "Mở Apple CarPlay trên màn hình xe trước")
+    CarPlaySession.State.LinkUp -> ConnectionStatus("Đang kết nối", "Đã thiết lập liên kết Bluetooth")
+    is CarPlaySession.State.MfiCertReceived -> ConnectionStatus("Đang kết nối", "Đang kiểm tra chứng chỉ MFi của xe")
+    is CarPlaySession.State.Authenticating -> ConnectionStatus("Đang kết nối", "Đang xác thực bảo mật với xe")
+    CarPlaySession.State.AuthComplete -> ConnectionStatus("Đang kết nối", "Xe đã chấp nhận xác thực")
+    CarPlaySession.State.Identified -> ConnectionStatus("Đang kết nối", "Đang khởi tạo giao diện CarPlay")
+    CarPlaySession.State.EaSessionOpen -> ConnectionStatus("Đang kết nối", "Phiên kết nối CarPlay đã mở")
+    CarPlaySession.State.WifiHandoffRequested -> ConnectionStatus("Đang kết nối", "Đang chuyển tiếp sang mạng Wi-Fi của xe")
+    is CarPlaySession.State.WifiHandoffReceived -> ConnectionStatus("Đang kết nối", "Đang tham gia mạng Wi-Fi: ${state.ssid}")
     is CarPlaySession.State.CarPlayAirPlayStart -> ConnectionStatus(
-        if (state.endpoint.receiverName.isBlank()) "CarPlay is ready" else "${state.endpoint.receiverName} connected",
-        "Car display starts automatically with the helper",
+        if (state.endpoint.receiverName.isBlank()) "CarPlay sẵn sàng" else "Đã kết nối: ${state.endpoint.receiverName}",
+        "Màn hình xe tự động hiển thị với Display Helper",
     )
     is CarPlaySession.State.Failed -> ConnectionStatus(
-        "Couldn't connect",
-        state.reason.ifBlank { "The receiver stopped the handshake" }.take(80),
+        "Không thể kết nối",
+        state.reason.ifBlank { "Xe đã ngắt quá trình bắt tay kết nối" }.take(80),
     )
 }
 
@@ -226,40 +228,40 @@ internal fun nextStep(
     listening: Boolean = false,
 ): NextStep = when {
     !permissions.allGranted -> NextStep(
-        "Allow permissions",
-        if (permissions.missing.size == 1) "1 permission needed" else "${permissions.missing.size} permissions needed",
-        "Allow",
+        "Cấp quyền ứng dụng",
+        if (permissions.missing.size == 1) "Cần cấp 1 quyền để tiếp tục" else "Cần cấp ${permissions.missing.size} quyền để tiếp tục",
+        "Cấp quyền",
         NextStep.Kind.Permissions,
     )
-    !bluetoothOn -> NextStep("Turn on Bluetooth", "Required to reach the car", "Turn on", NextStep.Kind.Bluetooth)
+    !bluetoothOn -> NextStep("Bật Bluetooth", "Cần bật Bluetooth để xe nhận diện điện thoại", "Bật", NextStep.Kind.Bluetooth)
     helper !is HelperClient.State.Connected && helper !is HelperClient.State.DisplayActive &&
         (shizuku is ShizukuHelperStarter.State.Unavailable || shizuku is ShizukuHelperStarter.State.Unsupported ||
             shizuku is ShizukuHelperStarter.State.PermissionDenied) -> NextStep(
-        "Set up Shizuku", if (shizuku is ShizukuHelperStarter.State.PermissionDenied)
-            "Allow CarDroid in Shizuku, then return here" else "Install or start Shizuku, then return here",
-        "Open Shizuku", NextStep.Kind.ShizukuOpen)
+        "Thiết lập Helper (ADB / Shizuku)", if (shizuku is ShizukuHelperStarter.State.PermissionDenied)
+            "Cho phép CarDroid trong Shizuku hoặc chạy lệnh ADB" else "Khởi chạy Helper qua ADB (1 lần) hoặc Shizuku",
+        "Mở cài đặt", NextStep.Kind.ShizukuOpen)
     helper !is HelperClient.State.Connected && helper !is HelperClient.State.DisplayActive &&
         shizuku is ShizukuHelperStarter.State.NeedsPermission -> NextStep(
-        "Approve Shizuku access", "Allows CarDroid to run apps on the car display", "Approve access", NextStep.Kind.ShizukuAllow)
+        "Cấp quyền Shizuku", "Cho phép CarDroid tạo màn hình ảo độc lập trên xe", "Cho phép", NextStep.Kind.ShizukuAllow)
     helper !is HelperClient.State.Connected && helper !is HelperClient.State.DisplayActive &&
         shizuku is ShizukuHelperStarter.State.Starting -> NextStep(
-        "Preparing car display", "Waiting for Shizuku to start the display helper", "Preparing…", NextStep.Kind.Preparing)
+        "Đang chuẩn bị màn hình xe", "Đang kích hoạt Display Helper…", "Đang chuẩn bị…", NextStep.Kind.Preparing)
     helper is HelperClient.State.Outdated ||
         (helper !is HelperClient.State.Connected && helper !is HelperClient.State.DisplayActive && shizuku is ShizukuHelperStarter.State.Error) -> NextStep(
-        "Prepare car display", if (shizuku is ShizukuHelperStarter.State.Error) shizuku.message.take(100)
-            else "The display helper needs an update", "Retry setup", NextStep.Kind.Helper)
+        "Khởi động lại Helper", if (shizuku is ShizukuHelperStarter.State.Error) shizuku.message.take(100)
+            else "Display Helper cần cập nhật phiên bản", "Thử lại", NextStep.Kind.Helper)
     helper is HelperClient.State.NotRunning && state != CarPlaySession.State.Idle &&
         state !is CarPlaySession.State.Failed -> NextStep(
-        "Prepare car display", "Finish display setup while the receiver connects", "Prepare display", NextStep.Kind.Helper)
+        "Chuẩn bị màn hình xe", "Hoàn tất thiết lập màn hình khi xe đang kết nối", "Chuẩn bị", NextStep.Kind.Helper)
     state is CarPlaySession.State.Failed ->
-        NextStep("Couldn't connect", state.reason.ifBlank { "The receiver stopped the handshake" }.take(80), "Try again", NextStep.Kind.Retry)
+        NextStep("Không thể kết nối", state.reason.ifBlank { "Xe đã ngắt quá trình bắt tay" }.take(80), "Thử lại", NextStep.Kind.Retry)
     state is CarPlaySession.State.CarPlayAirPlayStart ->
-        NextStep("Receiver connected", "The car display starts when media is ready", "Receiver connected", NextStep.Kind.Ready)
+        NextStep("Đã kết nối với xe", "Màn hình xe bắt đầu khi luồng media sẵn sàng", "Đã kết nối", NextStep.Kind.Ready)
     state == CarPlaySession.State.Idle && listening ->
-        NextStep("Waiting for your car", "Select this phone in the car’s CarPlay screen", "Waiting for car…", NextStep.Kind.Available)
+        NextStep("Đang chờ xe kết nối…", "Chọn điện thoại này trên màn hình CarPlay của xe", "Đang chờ…", NextStep.Kind.Available)
     state == CarPlaySession.State.Idle ->
-        NextStep("Make your phone available", "Then select this phone in the car’s CarPlay screen", "Make available", NextStep.Kind.Connect)
-    else -> describeConnection(state).let { NextStep(it.title, it.detail, "Cancel", NextStep.Kind.Connecting) }
+        NextStep("Sẵn sàng kết nối", "Bắt đầu để xe có thể tìm thấy điện thoại qua CarPlay", "Bắt đầu", NextStep.Kind.Connect)
+    else -> describeConnection(state).let { NextStep(it.title, it.detail, "Hủy", NextStep.Kind.Connecting) }
 }
 
 private enum class Sheet { Advanced }
@@ -617,24 +619,133 @@ private fun AdvancedSheet(
     onAutoStartBluetooth: (Boolean) -> Unit,
     onClearLog: () -> Unit,
 ) {
-    Text("Advanced", style = MaterialTheme.typography.headlineSmall)
-    SwitchRow("Extracted MFi keys", useHardcodedKeys, onHardcodedKeys)
-    SwitchRow("Start Bluetooth on open", autoStartBluetooth, onAutoStartBluetooth)
-    HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
+    val clipboardManager = androidx.compose.ui.platform.LocalClipboardManager.current
+    val context = androidx.compose.ui.platform.LocalContext.current
+    val displayMode by CarDroidSettings.displayMode.collectAsState()
+    val resolution by CarDroidSettings.resolutionPreset.collectAsState()
+    val fps by CarDroidSettings.videoFps.collectAsState()
+    val bitrate by CarDroidSettings.videoBitrateMbps.collectAsState()
+    val execMode by CarDroidSettings.executionMode.collectAsState()
+
+    var showCopiedToast by remember { mutableStateOf(false) }
+
+    Text("Cài đặt & Tối ưu hóa", style = MaterialTheme.typography.headlineSmall)
+    Spacer(Modifier.height(10.dp))
+
+    // 1. CHẾ ĐỘ HIỂN THỊ / GIAO THỨC
+    Text("Chế độ hiển thị & Giao thức", style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.primary)
+    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+        FilterChip(
+            selected = displayMode == CarDroidSettings.DisplayMode.DUAL_PANEL,
+            onClick = { CarDroidSettings.setDisplayMode(CarDroidSettings.DisplayMode.DUAL_PANEL) },
+            label = { Text("2 Cửa sổ (Dual)") }
+        )
+        FilterChip(
+            selected = displayMode == CarDroidSettings.DisplayMode.ANDROID_AUTO_COOLWALK,
+            onClick = { CarDroidSettings.setDisplayMode(CarDroidSettings.DisplayMode.ANDROID_AUTO_COOLWALK) },
+            label = { Text("Android Auto") }
+        )
+        FilterChip(
+            selected = displayMode == CarDroidSettings.DisplayMode.SCREEN_MIRROR,
+            onClick = { CarDroidSettings.setDisplayMode(CarDroidSettings.DisplayMode.SCREEN_MIRROR) },
+            label = { Text("Phản chiếu (Mirror)") }
+        )
+    }
+
+    HorizontalDivider(Modifier.padding(vertical = 12.dp), color = MaterialTheme.colorScheme.outlineVariant)
+
+    // 2. TỐI ƯU HÓA LUỒNG TRUYỀN PHÁT (PROTOCOL & VIDEO)
+    Text("Tối ưu hóa độ phân giải & Tốc độ", style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.primary)
+    Spacer(Modifier.height(4.dp))
+    Text("Độ phân giải:", style = MaterialTheme.typography.bodyMedium)
+    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+        listOf(
+            CarDroidSettings.ResolutionPreset.AUTO to "Tự động",
+            CarDroidSettings.ResolutionPreset.RES_1280X720 to "720p HD",
+            CarDroidSettings.ResolutionPreset.RES_1920X720_ULTRAWIDE to "Ultrawide",
+            CarDroidSettings.ResolutionPreset.RES_1920X1080 to "1080p FHD"
+        ).forEach { (res, label) ->
+            FilterChip(
+                selected = resolution == res,
+                onClick = { CarDroidSettings.setResolutionPreset(res) },
+                label = { Text(label) }
+            )
+        }
+    }
+
+    Spacer(Modifier.height(6.dp))
+    Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+        Text("Tốc độ khung hình (FPS):", style = MaterialTheme.typography.bodyMedium, modifier = Modifier.weight(1f))
+        FilterChip(
+            selected = fps == 30,
+            onClick = { CarDroidSettings.setVideoFps(30) },
+            label = { Text("30 fps") }
+        )
+        Spacer(Modifier.width(8.dp))
+        FilterChip(
+            selected = fps == 60,
+            onClick = { CarDroidSettings.setVideoFps(60) },
+            label = { Text("60 fps") }
+        )
+    }
+
+    Spacer(Modifier.height(6.dp))
+    Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+        Text("Bitrate truyền phát:", style = MaterialTheme.typography.bodyMedium, modifier = Modifier.weight(1f))
+        listOf(6, 10, 15).forEach { mbps ->
+            FilterChip(
+                selected = bitrate == mbps,
+                onClick = { CarDroidSettings.setVideoBitrateMbps(mbps) },
+                label = { Text("${mbps}M") },
+                modifier = Modifier.padding(horizontal = 2.dp)
+            )
+        }
+    }
+
+    HorizontalDivider(Modifier.padding(vertical = 12.dp), color = MaterialTheme.colorScheme.outlineVariant)
+
+    // 3. CHẾ ĐỘ MÁY KHÔNG ROOT & LỆNH ADB
+    Text("Chế độ máy không Root & Cấp quyền ADB", style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.primary)
+    Spacer(Modifier.height(4.dp))
+    Text(
+        "Kích hoạt độc lập qua ADB 1 lần duy nhất từ máy tính hoặc Wireless Debugging mà KHÔNG CẦN Shizuku:",
+        style = MaterialTheme.typography.bodySmall,
+        color = MaterialTheme.colorScheme.onSurfaceVariant
+    )
+    Spacer(Modifier.height(8.dp))
+    val adbCommand = "adb shell \"CLASSPATH=\$(pm path com.cardroid.app | head -n 1 | cut -d: -f2) setsid nohup app_process /system/bin --nice-name=cardroid-helper com.cardroid.app.helper.HelperMain --port=8253 > /dev/null 2>&1 &\""
+
+    OutlinedButton(
+        onClick = {
+            clipboardManager.setText(androidx.compose.ui.text.AnnotatedString(adbCommand))
+            showCopiedToast = true
+        },
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        Text(if (showCopiedToast) "✓ Đã sao chép lệnh ADB" else "📋 Sao chép lệnh ADB khởi chạy")
+    }
+
+    HorizontalDivider(Modifier.padding(vertical = 12.dp), color = MaterialTheme.colorScheme.outlineVariant)
+
+    // 4. TIỆN ÍCH KHÁC & LOGS
+    SwitchRow("Sử dụng MFi Keys trích xuất", useHardcodedKeys, onHardcodedKeys)
+    SwitchRow("Tự động mở Bluetooth khi vào app", autoStartBluetooth, onAutoStartBluetooth)
+    HorizontalDivider(Modifier.padding(vertical = 8.dp), color = MaterialTheme.colorScheme.outlineVariant)
+
     Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-        Text("Diagnostics", style = MaterialTheme.typography.titleMedium)
+        Text("Nhật ký chẩn đoán (Logs)", style = MaterialTheme.typography.titleMedium)
         Spacer(Modifier.weight(1f))
-        TextButton(onClick = onClearLog, enabled = log.isNotEmpty()) { Text("Clear") }
+        TextButton(onClick = onClearLog, enabled = log.isNotEmpty()) { Text("Xóa log") }
     }
     Surface(
         color = MaterialTheme.colorScheme.surfaceVariant,
         shape = MaterialTheme.shapes.medium,
-        modifier = Modifier.fillMaxWidth().height(170.dp),
+        modifier = Modifier.fillMaxWidth().height(160.dp),
     ) {
         Column(modifier = Modifier.verticalScroll(rememberScrollState()).padding(12.dp)) {
             if (log.isEmpty()) {
                 Text(
-                    "No events yet",
+                    "Chưa có sự kiện nào",
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )

@@ -1,3 +1,61 @@
 <resources>
+    <string name="app_name">CarDroid</string>
     <string name="remote_control_description">Lets a connected CarPlay receiver send touch and scroll gestures to this phone only while CarDroid is sharing. CarDroid does not read screen text or window contents.</string>
+
+    <!-- General UI & Navigation -->
+    <string name="title_launcher">Car Launcher</string>
+    <string name="title_settings">Settings</string>
+    <string name="title_status">Connection Status</string>
+    <string name="status_ready">Ready to connect</string>
+    <string name="status_connecting">Connecting…</string>
+    <string name="status_connected">Connected to car</string>
+    <string name="status_disconnected">Disconnected</string>
+    <string name="btn_start_service">Start CarDroid</string>
+    <string name="btn_stop_service">Stop CarDroid</string>
+    <string name="btn_enable_bluetooth">Enable Bluetooth</string>
+    <string name="btn_grant_permissions">Grant Permissions</string>
+    <string name="btn_setup_accessibility">Enable Touch Control</string>
+
+    <!-- Car Launcher UI -->
+    <string name="launcher_tap_to_choose">Tap the indicator to choose an app</string>
+    <string name="launcher_in_favorites">In favorites</string>
+    <string name="launcher_remove_favorite">Remove from favorites</string>
+    <string name="launcher_add_favorite">Add to favorites</string>
+    <string name="launcher_favorites_full">Favorites are full (max 6)</string>
+    <string name="launcher_hide_app">Hide from car</string>
+    <string name="launcher_recent_apps">Recent apps</string>
+    <string name="launcher_running_on_display">Running on the car display</string>
+    <string name="launcher_hidden_apps">Hidden apps</string>
+    <string name="launcher_hidden_apps_desc">Tap an app to show it on the car display again</string>
+    <string name="launcher_unhide">Show</string>
+
+    <!-- Display & Protocol Modes -->
+    <string name="mode_cardroid_dual">CarDroid Dual-Panel</string>
+    <string name="mode_cardroid_dual_desc">Run two Android apps side-by-side on the car screen</string>
+    <string name="mode_android_auto">Android Auto Coolwalk</string>
+    <string name="mode_android_auto_desc">Emulate Android Auto interface and bridge to Apple CarPlay</string>
+    <string name="mode_screen_mirror">Screen Mirroring (No Root)</string>
+    <string name="mode_screen_mirror_desc">Direct screen projection with touch control via Accessibility</string>
+
+    <!-- Protocol Optimization Settings -->
+    <string name="pref_category_protocol">CarPlay Protocol &amp; Stream Optimization</string>
+    <string name="pref_resolution">Display Resolution</string>
+    <string name="pref_resolution_desc">Choose resolution matching your car display</string>
+    <string name="pref_fps">Frame Rate</string>
+    <string name="pref_fps_desc">30 FPS (Battery friendly) or 60 FPS (Ultra smooth)</string>
+    <string name="pref_bitrate">Video Bitrate</string>
+    <string name="pref_bitrate_desc">Adjust streaming quality and wireless stability</string>
+    <string name="pref_auto_reconnect">Auto Reconnect</string>
+    <string name="pref_auto_reconnect_desc">Automatically resume connection when car Bluetooth is detected</string>
+
+    <!-- Non-Root & ADB Setup -->
+    <string name="pref_category_execution">Execution Mode &amp; Permissions</string>
+    <string name="execution_mode_title">Display Engine Mode</string>
+    <string name="execution_mode_shizuku">Shizuku / Root (Virtual Display)</string>
+    <string name="execution_mode_adb">One-time ADB Shell Helper (Recommended for Non-Root)</string>
+    <string name="execution_mode_noroot">Pure Non-Root (MediaProjection + Accessibility)</string>
+    <string name="adb_setup_guide_title">One-Time ADB Setup Guide</string>
+    <string name="adb_setup_guide_content">Run this command once via PC or Wireless Debugging to unlock separate virtual displays without root or Shizuku:</string>
+    <string name="btn_copy_adb_command">Copy ADB Command</string>
+    <string name="adb_command_copied">Command copied to clipboard</string>
 </resources>

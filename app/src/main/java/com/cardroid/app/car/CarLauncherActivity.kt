@@ -71,11 +71,20 @@ class CarLauncherActivity : ComponentActivity() {
         super.onDestroy()
     }
 
-    /** Designed launcher UI (Part B): dock + paged icon grid, favorites/hide via [CarLauncherPrefs]; see CarLauncherUi.kt. */
+    /** Designed launcher UI: dock + paged icon grid, or Android Auto Coolwalk emulation. */
     @Composable
     private fun LauncherContent(apps: List<CarApp>) {
+        val displayMode by com.cardroid.app.CarDroidSettings.displayMode.collectAsState()
         com.cardroid.app.CarDroidTheme {
-            CarLauncherScreen(apps, prefs, homeSignal) { app -> CarApps.launch(this@CarLauncherActivity, app, ownDisplayId) }
+            if (displayMode == com.cardroid.app.CarDroidSettings.DisplayMode.ANDROID_AUTO_COOLWALK) {
+                AndroidAutoCoolwalkScreen(apps, prefs, visible = true) { app ->
+                    CarApps.launch(this@CarLauncherActivity, app, ownDisplayId)
+                }
+            } else {
+                CarLauncherScreen(apps, prefs, homeSignal) { app ->
+                    CarApps.launch(this@CarLauncherActivity, app, ownDisplayId)
+                }
+            }
         }
     }
 }

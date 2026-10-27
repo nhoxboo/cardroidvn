@@ -4,7 +4,8 @@ plugins {
 }
 
 kotlin {
-    jvmToolchain(17)
+    val javaVersion = System.getProperty("java.specification.version")?.toIntOrNull() ?: 17
+    jvmToolchain(javaVersion)
 }
 
 application {

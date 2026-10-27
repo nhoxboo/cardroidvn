@@ -55,7 +55,8 @@ class DisplayEncoder(
                         setInteger(MediaFormat.KEY_COLOR_FORMAT, MediaCodecInfo.CodecCapabilities.COLOR_FormatSurface)
                         setInteger(MediaFormat.KEY_BIT_RATE, bitrate)
                         setInteger(MediaFormat.KEY_FRAME_RATE, fps)
-                        setInteger(MediaFormat.KEY_I_FRAME_INTERVAL, 10)
+                        // Use 1-second keyframe interval for car wireless streaming recovery
+                        setInteger(MediaFormat.KEY_I_FRAME_INTERVAL, 1)
                         if (baseline) {
                             setInteger(MediaFormat.KEY_PROFILE, MediaCodecInfo.CodecProfileLevel.AVCProfileBaseline)
                             setInteger(MediaFormat.KEY_LEVEL, level.constant)
