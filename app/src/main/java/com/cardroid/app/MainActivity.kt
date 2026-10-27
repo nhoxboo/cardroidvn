@@ -646,6 +646,11 @@ private fun AdvancedSheet(
             label = { Text("Android Auto") }
         )
         FilterChip(
+            selected = displayMode == CarDroidSettings.DisplayMode.SAMSUNG_DEX,
+            onClick = { CarDroidSettings.setDisplayMode(CarDroidSettings.DisplayMode.SAMSUNG_DEX) },
+            label = { Text("Samsung DeX") }
+        )
+        FilterChip(
             selected = displayMode == CarDroidSettings.DisplayMode.SCREEN_MIRROR,
             onClick = { CarDroidSettings.setDisplayMode(CarDroidSettings.DisplayMode.SCREEN_MIRROR) },
             label = { Text("Phản chiếu (Mirror)") }

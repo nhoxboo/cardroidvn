@@ -34,6 +34,8 @@
     <string name="mode_cardroid_dual_desc">Run two Android apps side-by-side on the car screen</string>
     <string name="mode_android_auto">Android Auto Coolwalk</string>
     <string name="mode_android_auto_desc">Emulate Android Auto interface and bridge to Apple CarPlay</string>
+    <string name="mode_samsung_dex">Samsung DeX in Car (Galaxy Z Fold / S Series)</string>
+    <string name="mode_samsung_dex_desc">Stream full Samsung DeX desktop multitasking environment to car screen</string>
     <string name="mode_screen_mirror">Screen Mirroring (No Root)</string>
     <string name="mode_screen_mirror_desc">Direct screen projection with touch control via Accessibility</string>
 

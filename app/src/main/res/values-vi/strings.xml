@@ -35,6 +35,8 @@
     <string name="mode_cardroid_dual_desc">Chạy 2 ứng dụng Android song song độc lập trên màn hình xe</string>
     <string name="mode_android_auto">Cầu nối Android Auto (Coolwalk UI)</string>
     <string name="mode_android_auto_desc">Giả lập giao diện Android Auto chuẩn xuất tín hiệu qua Apple CarPlay</string>
+    <string name="mode_samsung_dex">Samsung DeX trên Ô tô (Galaxy Z Fold 6 / S Series)</string>
+    <string name="mode_samsung_dex_desc">Chiếu toàn bộ môi trường máy tính Samsung DeX đa nhiệm lên màn hình xe</string>
     <string name="mode_screen_mirror">Phản chiếu màn hình (Không cần Root)</string>
     <string name="mode_screen_mirror_desc">Chiếu trực tiếp màn hình điện thoại với cảm ứng qua dịch vụ Trợ năng</string>
 

@@ -25,6 +25,7 @@ object CarDroidSettings {
     enum class DisplayMode(val id: String) {
         DUAL_PANEL("dual_panel"),
         ANDROID_AUTO_COOLWALK("android_auto_coolwalk"),
+        SAMSUNG_DEX("samsung_dex"),
         SCREEN_MIRROR("screen_mirror")
     }
 

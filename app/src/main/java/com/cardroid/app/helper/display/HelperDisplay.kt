@@ -62,6 +62,10 @@ class HelperDisplay(
         // Private, undecorated display: keep SystemUI's shade and secondary-keyguard
         // presentations off this canvas (some ROMs otherwise move shade focus off the phone).
         var f = OWN_CONTENT_ONLY or SUPPORTS_TOUCH or ROTATES_WITH_CONTENT
+        if (Build.MANUFACTURER.equals("samsung", ignoreCase = true)) {
+            // Enable Presentation & System Decorations for Samsung DeX on Galaxy Z Fold/S series
+            f = f or PRESENTATION or SHOULD_SHOW_SYSTEM_DECORATIONS
+        }
         if (Build.VERSION.SDK_INT >= 33) f = f or TRUSTED or OWN_DISPLAY_GROUP or ALWAYS_UNLOCKED or TOUCH_FEEDBACK_DISABLED
         if (Build.VERSION.SDK_INT >= 34) f = f or OWN_FOCUS or DEVICE_DISPLAY_GROUP
         return f
