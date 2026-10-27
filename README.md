@@ -4,12 +4,12 @@
 
 **Chạy ứng dụng Android, Android Auto và Samsung DeX trực tiếp trên màn hình Apple CarPlay không dây của ô tô.**
 
-[![GitHub Stars](https://img.shields.io/github/stars/nhoxboo/CarDroid?style=flat-square)](https://github.com/nhoxboo/CarDroid/stargazers)
-[![GitHub Forks](https://img.shields.io/github/forks/nhoxboo/CarDroid?style=flat-square)](https://github.com/nhoxboo/CarDroid/network)
-[![Platform](https://img.shields.io/badge/Platform-Android%208.0%2B-green?style=flat-square)](https://github.com/nhoxboo/CarDroid)
+[![GitHub Stars](https://img.shields.io/github/stars/nhoxboo/cardroidvn?style=flat-square)](https://github.com/nhoxboo/cardroidvn/stargazers)
+[![GitHub Forks](https://img.shields.io/github/forks/nhoxboo/cardroidvn?style=flat-square)](https://github.com/nhoxboo/cardroidvn/network)
+[![Platform](https://img.shields.io/badge/Platform-Android%208.0%2B-green?style=flat-square)](https://github.com/nhoxboo/cardroidvn)
 [![License](https://img.shields.io/badge/License-GPL%20v3-blue?style=flat-square)](LICENSE)
 
-[Tải về APK mới nhất](https://github.com/nhoxboo/CarDroid/releases) · [Báo lỗi / Góp ý](https://github.com/nhoxboo/CarDroid/issues) · [Hướng dẫn đóng góp](#hướng-dẫn-đóng-góp-dự-án-contributing)
+[Tải về APK mới nhất](https://github.com/nhoxboo/cardroidvn/releases) · [Báo lỗi / Góp ý](https://github.com/nhoxboo/cardroidvn/issues) · [Hướng dẫn đóng góp](#hướng-dẫn-đóng-góp-dự-án-contributing)
 
 </div>
 
