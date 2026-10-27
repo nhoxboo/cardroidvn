@@ -5,8 +5,8 @@ Author: Hoài Nam (cardroidvn)
 License: GPL v3
 
 Allows testing cardroidvn directly on your PC/Laptop without an actual car:
-- Wireless over Wi-Fi (Direct IP connection to port 8253)
-- Wireless ADB / USB ADB forward
+- Auto-scans local Wi-Fi / Hotspot network to find your phone automatically!
+- Direct Wireless over Wi-Fi (port 8253)
 - Live H.264 video rendering with low-latency ffplay
 """
 
@@ -17,6 +17,7 @@ import struct
 import subprocess
 import threading
 import time
+from concurrent.futures import ThreadPoolExecutor
 
 HELPER_PORT = 8253
 PROTO_VERSION = 6
@@ -49,7 +50,48 @@ def send_frame(sock, mtype, payload=b""):
     length = len(payload)
     sock.sendall(struct.pack(">IB", length, mtype) + payload)
 
-def detect_device_ip(adb_cmd):
+def get_local_ip_prefixes():
+    prefixes = []
+    try:
+        hostname = socket.gethostname()
+        for ip in socket.gethostbyname_ex(hostname)[2]:
+            if not ip.startswith("127."):
+                parts = ip.split(".")
+                prefixes.append(f"{parts[0]}.{parts[1]}.{parts[2]}.")
+    except Exception:
+        pass
+    for def_pref in ["192.168.137.", "192.168.1.", "192.168.0.", "192.168.43."]:
+        if def_pref not in prefixes:
+            prefixes.append(def_pref)
+    return prefixes
+
+def test_single_ip(ip):
+    try:
+        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        s.settimeout(0.3)
+        res = s.connect_ex((ip, HELPER_PORT))
+        s.close()
+        if res == 0:
+            return ip
+    except Exception:
+        pass
+    return None
+
+def scan_network_for_phone():
+    print("[*] Đang tự động quét mạng Wi-Fi để tìm điện thoại Z Fold 6...")
+    prefixes = get_local_ip_prefixes()
+    for prefix in prefixes:
+        print(f"  -> Quét dải mạng {prefix}1..254 (cổng {HELPER_PORT})...")
+        targets = [f"{prefix}{i}" for i in range(1, 255)]
+        with ThreadPoolExecutor(max_workers=50) as executor:
+            results = executor.map(test_single_ip, targets)
+            for found_ip in results:
+                if found_ip:
+                    print(f"  [✓] TÌM THẤY ĐIỆN THOẠI TẠI IP: {found_ip}")
+                    return found_ip
+    return None
+
+def detect_device_ip_via_adb(adb_cmd):
     try:
         res = subprocess.run([adb_cmd, "devices"], capture_output=True, text=True, check=True)
         for line in res.stdout.splitlines():
@@ -58,9 +100,14 @@ def detect_device_ip(adb_cmd):
                 dev = parts[0]
                 if ":" in dev:
                     return dev.split(":")[0]
+        res2 = subprocess.run([adb_cmd, "shell", "ip", "-f", "inet", "addr", "show", "wlan0"], capture_output=True, text=True)
+        for line in res2.stdout.splitlines():
+            line = line.strip()
+            if line.startswith("inet "):
+                return line.split()[1].split("/")[0]
     except Exception:
         pass
-    return "192.168.1.108"
+    return None
 
 def run_laptop_test(host=None, width=1280, height=720, dpi=160, fps=60, bitrate=8000000):
     print("===================================================================")
@@ -81,7 +128,9 @@ def run_laptop_test(host=None, width=1280, height=720, dpi=160, fps=60, bitrate=
 
     target_host = host
     if not target_host or target_host == "auto":
-        target_host = detect_device_ip(adb_cmd)
+        target_host = detect_device_ip_via_adb(adb_cmd)
+        if not target_host or target_host == "127.0.0.1":
+            target_host = scan_network_for_phone()
         if not target_host:
             target_host = "127.0.0.1"
 
@@ -90,15 +139,15 @@ def run_laptop_test(host=None, width=1280, height=720, dpi=160, fps=60, bitrate=
     print()
 
     control_sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    control_sock.settimeout(4.0)
+    control_sock.settimeout(5.0)
 
     try:
-        print(f"[1/4] Đang thử kết nối trực tiếp tới {target_host}:{HELPER_PORT}...")
+        print(f"[1/4] Đang kết nối không dây tới {target_host}:{HELPER_PORT}...")
         control_sock.connect((target_host, HELPER_PORT))
         print("  -> Kết nối trực tiếp qua mạng Wi-Fi thành công!")
     except Exception as direct_err:
-        print(f"  [Thông báo] Kết nối trực tiếp {target_host} chưa mở: {direct_err}")
-        print("  -> Đang chuyển tiếp qua cổng ADB (Wi-Fi ADB / USB)...")
+        print(f"  [Cảnh báo] Kết nối trực tiếp {target_host}:{HELPER_PORT} chưa được: {direct_err}")
+        print("  -> Đang chuyển tiếp qua cổng ADB...")
         try:
             subprocess.run([adb_cmd, "forward", f"tcp:{HELPER_PORT}", f"tcp:{HELPER_PORT}"], check=True)
             target_host = "127.0.0.1"
@@ -107,7 +156,11 @@ def run_laptop_test(host=None, width=1280, height=720, dpi=160, fps=60, bitrate=
             print("  -> Đã kết nối thành công qua cổng chuyển tiếp!")
         except Exception as e:
             print(f"[LỖI] Không thể kết nối tới Display Helper: {e}")
-            print("Vui lòng đảm bảo bạn đã chạy file 'tools\\cardroid-adb-setup.bat' trên máy tính!")
+            print()
+            print("Vui lòng kiểm tra 2 điều:")
+            print("1. Điện thoại Z Fold 6 và Laptop đang kết nối chung mạng Wi-Fi (hoặc Hotspot).")
+            print("2. Đã mở ứng dụng cardroidvn trên điện thoại và nhấn 'Bắt đầu'!")
+            print("   (Hoặc đã chạy file 'tools\\cardroid-adb-setup.bat' 1 lần để bật Helper)")
             return
 
     control_sock.settimeout(None)
